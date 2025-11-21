@@ -148,9 +148,8 @@ class GoogleDriveAPI:
         Скачиваем файл в папку
         """
         requests = self.service.files().get_media(fileId=file.id)
-        path = os.path.join(destination, file.name)
 
-        with FileIO(path, 'wb') as f:
+        with FileIO(destination, 'wb') as f:
             downloader = MediaIoBaseDownload(f, requests)
             is_done = False
 
