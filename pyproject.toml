@@ -1,0 +1,20 @@
+[project]
+name = "speech2text"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Bunny",email = "skeree2104@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "google-api-python-client (>=2.187.0,<3.0.0)",
+    "google-auth-httplib2 (>=0.2.1,<0.3.0)",
+    "google-auth-oauthlib (>=1.2.3,<2.0.0)",
+    "pydantic (>=2.12.4,<3.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"

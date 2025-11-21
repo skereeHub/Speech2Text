@@ -1,0 +1,13 @@
+.idea/
+
+.venv/
+.env
+
+audio/
+
+credentials.json
+token.json
+
+*.log
+*.pyc
+__pycache__
