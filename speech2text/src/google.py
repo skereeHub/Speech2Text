@@ -1,10 +1,8 @@
-import os.path
-from io import FileIO
-from functools import wraps
 import logging
+from pathlib import Path
+from functools import wraps
 
 from googleapiclient.http import MediaIoBaseDownload
-from pydantic import BaseModel
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -12,12 +10,9 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
+from speech2text.src.models import AudioFile
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s | %(name)s - %(levelname)s - %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S",
-)
+
 LOGGER: logging.Logger = logging.getLogger('GoogleDriveAPI')
 
 
@@ -48,12 +43,6 @@ def handle_http_errors(func):
     return wrapper
 
 
-class AudioFile(BaseModel):
-    id: str
-    name: str
-    mimeType: str
-
-
 class GoogleDriveAPI:
     """
     Класс для работы с Google Drive API
@@ -62,13 +51,12 @@ class GoogleDriveAPI:
     # drive
     # drive.readonly
     # drive.metadata.readonly
-    SCOPES = "https://www.googleapis.com/auth/"
-    FOLDER_ID = '1LKZSb8Z2ZFQGXffoitNpDytiSgA4GT0C' # audio/ на гугл диске
+    URL = 'https://www.googleapis.com/auth/'
 
     def __init__(self, *, scopes: list[str]):
         self.creds: Credentials | None = None
         self.service = None # Drive API Client
-        self.scopes = [GoogleDriveAPI.SCOPES + scope for scope in scopes]
+        self.scopes = [GoogleDriveAPI.URL + scope for scope in scopes]
 
     def __enter__(self):
         self._get_creds()   # Проверяем токены
@@ -84,8 +72,8 @@ class GoogleDriveAPI:
 
         # Файл tokes.json хранит в себе access и refresh токены
         # создается автоматически после первой авторизации
-        self.creds = Credentials.from_authorized_user_file("token.json", self.scopes) \
-            if os.path.exists("token.json") else None
+        self.creds = Credentials.from_authorized_user_file('token.json', self.scopes) \
+            if Path('token.json').exists() else None
 
         # Если их нет или они не валидны - аутентификация
         if not self.creds or not self.creds.valid:
@@ -100,16 +88,15 @@ class GoogleDriveAPI:
             else:
                 LOGGER.info('Необходима авторизация')
                 flow = InstalledAppFlow.from_client_secrets_file(
-                    "credentials.json", self.scopes
+                    'credentials.json', self.scopes
                 )
                 self.creds = flow.run_local_server(port=0)
 
             # Сохраняем токены в token.json
-            with open("token.json", "w") as token:
-                token.write(self.creds.to_json())
+            Path('token.json').write_text(self.creds.to_json())
 
     @handle_http_errors
-    def get_all_audio(self) -> list[AudioFile]:
+    def get_all_audio(self, folder_id: str) -> list[AudioFile]:
         """
         Получаем все аудиофайлы из папки audio/
 
@@ -121,7 +108,7 @@ class GoogleDriveAPI:
         audio_files: list[dict[str, str]] = []
         page_token = None
         query = (
-            f'"{self.FOLDER_ID}" in parents and '
+            f'"{folder_id}" in parents and '
             'mimeType contains "audio/" and '
             'trashed = false'
         )
@@ -143,13 +130,13 @@ class GoogleDriveAPI:
         return [AudioFile(**item) for item in audio_files]
 
     @handle_http_errors
-    def download_audio(self, file: AudioFile, destination: str):
+    def download_audio(self, file: AudioFile, destination: Path):
         """
         Скачиваем файл в папку
         """
         requests = self.service.files().get_media(fileId=file.id)
 
-        with FileIO(destination, 'wb') as f:
+        with destination.open('wb') as f:
             downloader = MediaIoBaseDownload(f, requests)
             is_done = False
 
