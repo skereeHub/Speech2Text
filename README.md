@@ -6,12 +6,14 @@
 ### Що є на цей час:
 * [x] Завантаження аудіофайлів з Google Drive.
 * [x] Отримання тексту з аудіо (Speech-to-text)
-* [ ] Аналіз діалогу з клієнтом
+* [x] Аналіз діалогу з клієнтом
+* [ ] Збереження результатів в Exel файл
 
 ### Залежності:
 - Python >=3.11
 - Google Cloud API
 - ElevenLabs API
+- Gemini API
 
 ### Налаштування IDE:
 1) `poetry install`
@@ -29,11 +31,18 @@
 ### Налаштування ElevenLabs (для speech-to-text)
 1) Перейти на [ElevenLabs](https://elevenlabs.io/app/developers)
 2) API Keys -> Create Key -> Speach to Text Enabled
-3) Ключ вставляємо в .env (див. .env.example)
+3) Зберегти ключ в .env (див. .env.example)
+
+### Налаштування Gemini API (для аналізу тексту)
+1) Перейти на [Google AI Studio](https://aistudio.google.com/app/api-keys)
+2) Create API Key
+3) Зберегти ключ в .env (див. .env.example)
 
 
 ### TODO:
-* [ ] аналіз тексту
+* [x] аналіз тексту
+* [ ] розширити можливості аналізу
+* [ ] зберегти результат аналізу в exel таблицю
 * [ ] сховати google creds в .env файл
 * [ ] прокинути folder_id у .env файл
 * [ ] налаштувати logging

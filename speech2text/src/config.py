@@ -18,3 +18,9 @@ class LABSConfig(BaseConfig):
     model_config = SettingsConfigDict(env_prefix="LABS_")
 
     api_key: str
+
+
+class GeminiConfig(BaseConfig):
+    model_config = SettingsConfigDict(env_prefix="GEMINI_")
+
+    api_key: str

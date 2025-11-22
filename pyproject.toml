@@ -14,7 +14,8 @@ dependencies = [
     "pydantic (>=2.12.4,<3.0.0)",
     "pydantic-settings (>=2.12.0,<3.0.0)",
     "nlpcloud (>=1.1.47,<2.0.0)",
-    "elevenlabs (>=2.24.0,<3.0.0)"
+    "elevenlabs (>=2.24.0,<3.0.0)",
+    "google-genai (>=1.52.0,<2.0.0)"
 ]
 
 

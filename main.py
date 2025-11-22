@@ -1,7 +1,11 @@
 import logging
 from pathlib import Path
 
-from speech2text.src import GoogleDriveAPI, GoogleDriveAPIError, NLPClient, ElevenLabsClient
+from speech2text.src import (
+    GoogleDriveAPI,
+    ElevenLabsClient,
+    GeminiClient,
+)
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -17,7 +21,6 @@ FOLDER = Path('audio')
 def load_from_google_drive():
     """
     Загружаем записи из Google Drive
-    :return:
     """
     # ??? по желанию можем обработать GoogleDriveAPIError
 
@@ -39,6 +42,9 @@ def load_from_google_drive():
                 api.download_audio(audio, dst)
 
 def load_transcription():
+    """
+    Создаем файли транскрипции
+    """
     # Пробовал NLP Cloud
     # nlp = NLPClient()
     # file = FOLDER / '2024-11-13_12-57_0667131186_outgoing.mp3'
@@ -58,10 +64,21 @@ def load_transcription():
         dst.write_text(text, encoding='utf-8')
         LOGGER.info(f'File {audio_file.name} is done')
 
+def rate_audio():
+    gemini = GeminiClient()
+    files = (f for f in FOLDER.iterdir() if f.suffix == '.txt')
+
+    for file in files:
+        content = file.read_text(encoding='utf-8')
+        result = gemini.analyze_dialogue(content)
+        print(result)
+
+        break
+
 def main():
     load_from_google_drive()
-    # load_transcription()
-
+    load_transcription()
+    rate_audio()
 
 if __name__ == '__main__':
     try:
