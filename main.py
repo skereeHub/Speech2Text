@@ -2,7 +2,6 @@ import logging
 from pathlib import Path
 
 from speech2text.src import (
-    GoogleDriveConfig,
     GoogleDriveAPI,
     ElevenLabsClient,
     GeminiClient,
@@ -33,7 +32,7 @@ def load_from_google_drive():
 
     with GoogleDriveAPI(scopes=scopes) as api:
         # Получаем файлы из Google Drive
-        files = api.get_all_audio(GoogleDriveConfig().folder_id)
+        files = api.get_all_audio()
 
         for audio in files:
 
