@@ -3,45 +3,57 @@ import json
 from google import genai
 from google.genai.types import Schema, Type, GenerateContentConfig
 
-from pydantic import BaseModel
-
 from speech2text.src.config import GeminiConfig
-
-
-class ComplianceChecklist(BaseModel):
-    id: str
-    rule: str
+from speech2text.src.models import RuleID, ComplianceChecklist
 
 
 class GeminiClient:
+    """
+    Клиент для работы с Gemini API для анализа текста
+    """
     MODEL = 'gemini-2.5-flash'
 
+    # Чек-лист правил для проверки
     COMPLIANCE_CHECKLIST: list[ComplianceChecklist] = [
-        ComplianceChecklist(id='greeting', rule='Менеджер розпочав розмову з чіткого привітання'),
-        ComplianceChecklist(id='parting', rule='Розмова була завершена чітким прощанням'),
+        ComplianceChecklist(id=RuleID.GREETING, rule='Менеджер розпочав розмову з чіткого привітання.'),
+        ComplianceChecklist(id=RuleID.PARTING, rule='Розмова була завершена чітким прощанням.'),
+        ComplianceChecklist(id=RuleID.CAR_BODY, rule='Менеджер дізнався кузов автомобіля.'),
+        ComplianceChecklist(id=RuleID.CAR_YEAR, rule='Менеджер дізнався рік автомобіля.'),
+        ComplianceChecklist(id=RuleID.CAR_MILEAGE, rule='Менеджер дізнався пробіг автомобіля.'),
+        ComplianceChecklist(id=RuleID.COMPREHENSIVE_DIAGNOSIS, rule='Менеджер зробив пропозицію комплексної діагностики автомобіля.'),
+        ComplianceChecklist(id=RuleID.PREVIOUS_WORKS, rule='Менеджер дізнався, які роботи з автомобілем проводились раніше.'),
     ]
 
+    # Выходная схема JSON формата, которую мы получаем в ответе от Gemini
     JSON_OUTPUT_SHEMA = Schema(
         type=Type.OBJECT,
         properties={
             'result': Schema(
                 type=Type.ARRAY,
-                description='Результати перевірки кожного пункту чек-листу',
+                description='Результати перевірки кожного пункту чек-листу.',
                 items=Schema(
                     type=Type.OBJECT,
                     properties={
-                        'id': Schema(type=Type.STRING, description='ID правила з чек-листа'),
-                        'check': Schema(type=Type.BOOLEAN, description='Чи виконано правило'),
+                        'id': Schema(type=Type.STRING, description='ID правила з чек-листа.'),
+                        'check': Schema(type=Type.BOOLEAN, description='Чи виконано правило.'),
                     },
                     required=['id', 'check']
                 )
             ),
+            'appointment': Schema(
+                type=Type.STRING,
+                description='Дата та час запису, якщо менеджер домовився. Якщо запису немає, залишити порожній рядок.'
+            ),
+            'bad_moments': Schema(
+                type=Type.STRING,
+                description='Виділити дуже критичні моменти діалогу з клієнтом (наприклад: грубість, неточність, довгі паузи), пропускаючи мілкі недоліки'
+            ),
             'overall': Schema(
                 type=Type.STRING,
-                description='Коротке резюме щодо цієї розмови'
+                description='Коротке резюме щодо цієї розмови та загальний висновок щодо якості.'
             )
         },
-        required=['result', 'overall']
+        required=['result', 'appointment', 'bad_moments', 'overall']
     )
 
     def __init__(self):
@@ -52,8 +64,8 @@ class GeminiClient:
     def _create_system_prompt():
         rules = '\n'.join(
             [
-                f'- ID: {item.id} | Правило: {item.rule}'
-                for item in GeminiClient.COMPLIANCE_CHECKLIST
+                f'- ID: {check.id} | Правило: {check.rule}'
+                for check in GeminiClient.COMPLIANCE_CHECKLIST
             ]
         )
 

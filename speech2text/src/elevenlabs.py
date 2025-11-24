@@ -1,7 +1,6 @@
 from pathlib import Path
 
 from elevenlabs.client import ElevenLabs
-# from elevenlabs.types import SpeechToTextChunkResponseModel
 
 from speech2text.src.config import LABSConfig
 from speech2text.src.utils import benchmark
@@ -10,7 +9,6 @@ from speech2text.src.utils import benchmark
 class ElevenLabsClient:
     """
     Клиент для работы с ElevenLabs API (https://elevenlabs.io/docs/overview)
-        В отличие от NLP Cloud, позволяет работать с файлами длиною 200с+
     """
 
     def __init__(self):

@@ -11,6 +11,7 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 from speech2text.src.models import AudioFile
+from speech2text.src.config import GoogleDriveConfig
 
 
 LOGGER: logging.Logger = logging.getLogger('GoogleDriveAPI')
@@ -52,6 +53,8 @@ class GoogleDriveAPI:
     # drive.readonly
     # drive.metadata.readonly
     URL = 'https://www.googleapis.com/auth/'
+
+    FOLDER_ID = GoogleDriveConfig().folder_id
 
     def __init__(self, *, scopes: list[str]):
         self.creds: Credentials | None = None
@@ -96,11 +99,9 @@ class GoogleDriveAPI:
             Path('token.json').write_text(self.creds.to_json())
 
     @handle_http_errors
-    def get_all_audio(self, folder_id: str) -> list[AudioFile]:
+    def get_all_audio(self) -> list[AudioFile]:
         """
         Получаем все аудиофайлы из папки audio/
-
-        TODO: прокинуть folder_id через аргумент
         :return:
             list[AudioFile]
         """
@@ -108,7 +109,7 @@ class GoogleDriveAPI:
         audio_files: list[dict[str, str]] = []
         page_token = None
         query = (
-            f'"{folder_id}" in parents and '
+            f'"{GoogleDriveAPI.FOLDER_ID}" in parents and '
             'mimeType contains "audio/" and '
             'trashed = false'
         )
@@ -138,10 +139,9 @@ class GoogleDriveAPI:
 
         with destination.open('wb') as f:
             downloader = MediaIoBaseDownload(f, requests)
-            is_done = False
 
+            is_done = False
             while not is_done:
                 _, is_done = downloader.next_chunk()
 
             LOGGER.info(f'Файл {file.name} успешно скачан')
-

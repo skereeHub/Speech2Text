@@ -7,20 +7,28 @@ class BaseConfig(BaseSettings):
         extra = "ignore"
 
 
-class NLPConfig(BaseConfig):
-    model_config = SettingsConfigDict(env_prefix="NLP_")
+class GoogleDriveConfig(BaseConfig):
+    """
+    Для Google Drive
+    """
+    model_config = SettingsConfigDict(env_prefix="DRIVE_")
 
-    token: str
-    model: str
+    folder_id: str
 
 
 class LABSConfig(BaseConfig):
+    """
+    Для ElevenLabs
+    """
     model_config = SettingsConfigDict(env_prefix="LABS_")
 
     api_key: str
 
 
 class GeminiConfig(BaseConfig):
+    """
+    Дл Gemini
+    """
     model_config = SettingsConfigDict(env_prefix="GEMINI_")
 
     api_key: str

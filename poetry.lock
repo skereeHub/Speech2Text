@@ -203,6 +203,18 @@ websockets = ">=11.0"
 pyaudio = ["pyaudio (>=0.2.14)"]
 
 [[package]]
+name = "et-xmlfile"
+version = "2.0.0"
+description = "An implementation of lxml.xmlfile for the standard library"
+optional = false
+python-versions = ">=3.8"
+groups = ["main"]
+files = [
+    {file = "et_xmlfile-2.0.0-py3-none-any.whl", hash = "sha256:7a91720bc756843502c3b7504c77b8fe44217c85c537d85037f0f536151b2caa"},
+    {file = "et_xmlfile-2.0.0.tar.gz", hash = "sha256:dab3f4764309081ce75662649be815c4c9081e88f0837825f90fd28317d4da54"},
+]
+
+[[package]]
 name = "google-api-core"
 version = "2.28.1"
 description = "Google API client core library"
@@ -445,21 +457,6 @@ files = [
 all = ["flake8 (>=7.1.1)", "mypy (>=1.11.2)", "pytest (>=8.3.2)", "ruff (>=0.6.2)"]
 
 [[package]]
-name = "nlpcloud"
-version = "1.1.47"
-description = "Python client for the NLP Cloud API"
-optional = false
-python-versions = "*"
-groups = ["main"]
-files = [
-    {file = "nlpcloud-1.1.47-py3-none-any.whl", hash = "sha256:8905e512bf4ccec299debeb5b23b9723e5d45773277ed2096bdc35726825d40c"},
-    {file = "nlpcloud-1.1.47.tar.gz", hash = "sha256:ce3ea1bab3c4ccd95bac3eadaeafb340704d838949306c3e5c7579d6b05af4c9"},
-]
-
-[package.dependencies]
-requests = "*"
-
-[[package]]
 name = "oauthlib"
 version = "3.3.1"
 description = "A generic, spec-compliant, thorough implementation of the OAuth request-signing logic"
@@ -475,6 +472,21 @@ files = [
 rsa = ["cryptography (>=3.0.0)"]
 signals = ["blinker (>=1.4.0)"]
 signedtoken = ["cryptography (>=3.0.0)", "pyjwt (>=2.0.0,<3)"]
+
+[[package]]
+name = "openpyxl"
+version = "3.1.5"
+description = "A Python library to read/write Excel 2010 xlsx/xlsm files"
+optional = false
+python-versions = ">=3.8"
+groups = ["main"]
+files = [
+    {file = "openpyxl-3.1.5-py2.py3-none-any.whl", hash = "sha256:5282c12b107bffeef825f4617dc029afaf41d0ea60823bbb665ef3079dc79de2"},
+    {file = "openpyxl-3.1.5.tar.gz", hash = "sha256:cf0e3cf56142039133628b5acffe8ef0c12bc902d2aadd3e0fe5878dc08d1050"},
+]
+
+[package.dependencies]
+et-xmlfile = "*"
 
 [[package]]
 name = "proto-plus"
@@ -974,4 +986,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11,<4.0"
-content-hash = "8acd21a9224261b440265acdd597bb0dbdd44f3f032b003de7c5391d33cf594b"
+content-hash = "29bc213c0ff861c9a9e6c19b3612fd9754fe2ba5b78ea344324eb9099bae194a"

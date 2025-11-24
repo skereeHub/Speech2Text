@@ -2,9 +2,13 @@ import logging
 from pathlib import Path
 
 from speech2text.src import (
+    GoogleDriveConfig,
     GoogleDriveAPI,
     ElevenLabsClient,
     GeminiClient,
+    Report,
+    date_from_filename,
+    Excel,
 )
 
 logging.basicConfig(
@@ -27,12 +31,9 @@ def load_from_google_drive():
     # Прав на чтение нам хватит для скачивания файла
     scopes = ['drive.readonly']
 
-    # ID папки audio/ на Google Drive (можно посмотреть через браузер в ссылке)
-    folder_id = '1LKZSb8Z2ZFQGXffoitNpDytiSgA4GT0C'
-
     with GoogleDriveAPI(scopes=scopes) as api:
         # Получаем файлы из Google Drive
-        files = api.get_all_audio(folder_id)
+        files = api.get_all_audio(GoogleDriveConfig().folder_id)
 
         for audio in files:
 
@@ -43,14 +44,8 @@ def load_from_google_drive():
 
 def load_transcription():
     """
-    Создаем файли транскрипции
+    Создаем текстовые файлы
     """
-    # Пробовал NLP Cloud
-    # nlp = NLPClient()
-    # file = FOLDER / '2024-11-13_12-57_0667131186_outgoing.mp3'
-    # response = nlp.transcribe(file)
-    # print(response)
-
     labs = ElevenLabsClient()
 
     for audio_file in FOLDER.iterdir():
@@ -64,21 +59,27 @@ def load_transcription():
         dst.write_text(text, encoding='utf-8')
         LOGGER.info(f'File {audio_file.name} is done')
 
-def rate_audio():
+def analyzing_audio():
+    """
+    Отдаём текст Gemini, записываем результат в Excel таблицу
+    """
     gemini = GeminiClient()
     files = (f for f in FOLDER.iterdir() if f.suffix == '.txt')
 
-    for file in files:
-        content = file.read_text(encoding='utf-8')
-        result = gemini.analyze_dialogue(content)
-        print(result)
-
-        break
+    with Excel() as excel:
+        for file in files:
+            content = file.read_text(encoding='utf-8')
+            report = gemini.analyze_dialogue(content)
+            report['date'] = date_from_filename(file.stem)
+            report = Report(**report)
+            excel.write_report(report)
+            LOGGER.info(f'Report for {file.stem} is done')
 
 def main():
     load_from_google_drive()
     load_transcription()
-    rate_audio()
+    analyzing_audio()
+    LOGGER.info('DONE')
 
 if __name__ == '__main__':
     try:

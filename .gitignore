@@ -11,3 +11,6 @@ token.json
 *.log
 *.pyc
 __pycache__
+
+###
+*.xlsx
